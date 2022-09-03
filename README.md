@@ -1,4 +1,4 @@
-# pybullet_cv
+# Learning robots by self-observation
 
 Available models in urdf folder:
 
