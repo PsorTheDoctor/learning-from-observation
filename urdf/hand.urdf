@@ -1,29 +1,29 @@
 <robot name="hand">
 
-<link name="palm">
+<link name="stand">
     <inertial>
-        <origin rpy="0 0 0" xyz="0 -1 0" />
-        <mass value="1.0" />
+        <origin rpy="1.57 0 0" xyz="0 -3.5 0" />
+        <mass value="1000" />
         <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
     </inertial>
     <visual name="">
         <geometry>
-            <box size="3.5 2 0.5" />
+            <cylinder radius="1.5" length="0.5" />
         </geometry>
         <material name="white">
             <color rgba="1 1 1 1" />
         </material>
-        <origin rpy="0 0 0" xyz="0 -1 0" />
+        <origin rpy="1.57 0 0" xyz="0 -3.5 0" />
     </visual>
     <collision name="">
         <geometry>
-           <box size="3.5 2 0.5" />
+           <cylinder radius="1.5" length="0.5" />
         </geometry>
-        <origin rpy="0 0 0" xyz="0 -1 0" />
+        <origin rpy="1.57 0 0" xyz="0 -3.5 0" />
     </collision>
 </link>
 
-<link name="wrist">
+<link name="palm-base">
     <inertial>
         <origin rpy="0 0 0" xyz="0 -2 0" />
         <mass value="1.0" />
@@ -43,6 +43,29 @@
            <cylinder radius="1.75" length="0.5" />
         </geometry>
         <origin rpy="0 0 0" xyz="0 -2 0" />
+    </collision>
+</link>
+
+<link name="palm">
+    <inertial>
+        <origin rpy="0 0 0" xyz="0 -1 0" />
+        <mass value="1.0" />
+        <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0" />
+    </inertial>
+    <visual name="">
+        <geometry>
+            <box size="3.5 2 0.51" />
+        </geometry>
+        <material name="white">
+            <color rgba="1 1 1 1" />
+        </material>
+        <origin rpy="0 0 0" xyz="0 -1 0" />
+    </visual>
+    <collision name="">
+        <geometry>
+           <box size="3.5 2 0.5" />
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 -1 0" />
     </collision>
 </link>
 
@@ -322,10 +345,16 @@
     </collision>
 </link>
 
-<joint name="palm-wrist" type="fixed">
+<joint name="stand" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0" />
-    <parent link="palm" />
-    <child link="wrist" />
+    <parent link="stand" />
+    <child link="palm-base" />
+</joint>
+
+<joint name="palm" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0" />
+    <parent link="palm-base" />
+    <child link="palm" />
 </joint>
 
 <joint name="index-finger-mcp" type="revolute">
