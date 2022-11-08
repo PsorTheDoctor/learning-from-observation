@@ -1,56 +1,148 @@
 import tensorflow as tf
-import cv2 as cv
 from models.model import AlexNet, TestModel
-from random import randint
+from models.vit import DeepViT
+# from models.swin import SwinTransformerModel
 import pandas as pd
 import numpy as np
-from datetime import datetime
+import datetime
 from const import *
 import os
 
 # https://www.inference.org.uk/itprnn/book.pdf
+JOINT_PATH = "data/snake/joints.npy"
+IMAGES_PATH = "data/snake/images.npy"
+VALIDATION_SIZE = 100
+BATCH_SIZE = 64
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # ensuring it is running on cpu
-tf.keras.backend.set_floatx('float64')
-batch_size = 16
-model = AlexNet(14)
-train_source = DATA_TRAIN
-test_source = DATA_TEST
-output_data = pd.read_csv(f"{train_source}/joints.csv").to_numpy()
-output_data_test = pd.read_csv(f"{test_source}/joints.csv").to_numpy()
-loss_fun = tf.keras.losses.MeanSquaredError()
-opt = tf.optimizers.Adam(learning_rate=0.0001)
-log_dir = f"./logs/{datetime.now().strftime('%H%M%S')}"
-writer = tf.summary.create_file_writer(log_dir)
-writer.set_as_default()
+def vit():
 
-data_indicies = range(len(output_data))
-test_indicies = range(len(output_data_test))
+    # read images and joint positions
+    joint_pos = np.reshape(np.load(JOINT_PATH), (-1, 2))
+    images = np.load(IMAGES_PATH)
 
-for step in range(50000):
-    # train
-    indices = np.random.choice(data_indicies, size=batch_size)
-    batch_input = tf.constant([np.load(f"{train_source}/images/{i}", allow_pickle=True) for i in indices], dtype=tf.float64)
-    batch_output = tf.constant([output_data[i] for i in indices], dtype=tf.float64)
+    validation_data = (images[0:VALIDATION_SIZE], joint_pos[0:VALIDATION_SIZE])
+    # remove validation data from training data
+    images = images[VALIDATION_SIZE:]
+    joint_pos = joint_pos[VALIDATION_SIZE:]
 
-    with tf.GradientTape() as tape:
-        out, _ = model(batch_input)
-        loss = loss_fun(batch_output, out)
+    # create model vit
+    model = DeepViT(
+        image_size = 224,
+        patch_size = 28,
+        num_classes = 2,
+        dim = 1024, # 26x26
+        depth = 3,
+        heads = 10,
+        mlp_dim = 512,
+        dropout = 0.1,
+        emb_dropout = 0.1
+    )
 
-    gradients = tape.gradient(loss, model.trainable_variables)
-    opt.apply_gradients(zip(gradients, model.trainable_variables))
-    tf.summary.scalar(f'loss {train_source}', loss, step=step)
+    # create optimizer
+    optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
 
-    # test
-    indices = np.random.choice(test_indicies, size=4)
-    batch_input = tf.constant([np.load(f"{test_source}/images/{i}", allow_pickle=True) for i in indices], dtype=tf.float64)
-    batch_output = tf.constant([output_data_test[i] for i in indices],
-                            dtype=tf.float64)
+    # create loss function
+    loss_fn = tf.keras.losses.Huber()
 
-    out, images = model(batch_input)
-    loss = loss_fun(batch_output, out)
-    tf.summary.scalar(f'loss {test_source}', loss, step=step)
-    tf.summary.image(f'original {test_source}', batch_input, step=step)
-    imgs = tf.split(images, num_or_size_splits=5, axis=3)
-    for i, img in enumerate(imgs):
-        tf.summary.image(f'processed {i}', img, step=step)
+    # create tensorboard
+    log_dir = "logs/vit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    writer = tf.summary.create_file_writer(log_dir)
+    writer.set_as_default()
+
+    #set default tensorboard
+    tf.summary.trace_on(graph=True, profiler=True)
+
+    # custom training loop
+    for i in range(10000):
+        # random BATCH_SIZE indexes for batch processing
+        indexes = np.random.randint(0, len(images), BATCH_SIZE)
+        # get batch images and joint positions
+        batch_images = images[indexes]
+        batch_joint_pos = joint_pos[indexes]
+        with tf.GradientTape() as tape:
+            out = model(batch_images)
+            loss = loss_fn(batch_joint_pos, out)
+        grads = tape.gradient(loss, model.trainable_weights)
+        optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        # tensorboard
+        tf.summary.scalar('loss', loss, step=i)
+        tf.summary.histogram('out', out, step=i)
+        tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
+        # validation step
+        if i % 10 == 0:
+            # random BATCH_SIZE indexes for batch processing
+            indexes = np.random.randint(0, VALIDATION_SIZE, BATCH_SIZE)
+            # get batch images and joint positions
+            batch_images = validation_data[0][indexes]
+            batch_joint_pos = validation_data[1][indexes]
+            out = model(batch_images)
+            loss = loss_fn(batch_joint_pos, out)
+            tf.summary.scalar('val_loss', loss, step=i)
+            tf.summary.histogram('val_out', out, step=i)
+            tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+
+def swin():
+    #read images and joint positions
+    joint_pos = np.reshape(np.load(JOINT_PATH), (-1, 2))
+    images = np.load(IMAGES_PATH)
+
+    validation_data = (images[0:VALIDATION_SIZE], joint_pos[0:VALIDATION_SIZE])
+    #remove validation data from training data
+    images = images[VALIDATION_SIZE:]
+    joint_pos = joint_pos[VALIDATION_SIZE:]
+
+    #create model swin
+    model = SwinTransformerModel(
+        image_size = (224,224),
+        patch_size = (28,28),
+        num_classes=2,
+        include_top=True,
+        window_size=8,
+        ape = True,
+        embed_dim = 192)
+
+    #create optimizer
+    optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
+
+    #create loss function
+    loss_fn = tf.keras.losses.Huber()
+
+    #create tensorboard
+    log_dir = "logs/swin/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    writer = tf.summary.create_file_writer(log_dir)
+    writer.set_as_default()
+
+    #set default tensorboard
+    tf.summary.trace_on(graph=True, profiler=True)
+
+    #custom training loop
+    for i in range(10000):
+        #random BATCH_SIZE indexes for batch processing
+        indexes = np.random.randint(0, len(images), BATCH_SIZE)
+        #get batch images and joint positions
+        batch_images = images[indexes]
+        batch_joint_pos = joint_pos[indexes]
+        with tf.GradientTape() as tape:
+            out = model(batch_images)
+            loss = loss_fn(batch_joint_pos, out)
+        grads = tape.gradient(loss, model.trainable_weights)
+        optimizer.apply_gradients(zip(grads, model.trainable_weights))
+        #tensorboard
+        tf.summary.scalar('loss', loss, step=i)
+        tf.summary.histogram('out', out, step=i)
+        tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
+        #validation step
+        if i % 10 == 0:
+            #random BATCH_SIZE indexes for batch processing
+            indexes = np.random.randint(0, VALIDATION_SIZE, BATCH_SIZE)
+            #get batch images and joint positions
+            batch_images = validation_data[0][indexes]
+            batch_joint_pos = validation_data[1][indexes]
+            out = model(batch_images)
+            loss = loss_fn(batch_joint_pos, out)
+            tf.summary.scalar('val_loss', loss, step=i)
+            tf.summary.histogram('val_out', out, step=i)
+            tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+
+if __name__ == "__main__":
+    vit()

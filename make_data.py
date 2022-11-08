@@ -1,8 +1,10 @@
+from copy import deepcopy
 import pybullet as p
 import pybullet_data
 import numpy as np
 import cv2
 import time
+import os
 import random
 
 p.connect(p.GUI)
@@ -34,6 +36,69 @@ def makeManipulatorDataset(numSamples=10000):
     manipulator = p.loadURDF('urdf/snake.urdf', [0, 0, 2.25], orn)
     makeDataset(manipulator, 'manipulator', numSamples, motionRange=2,
                 camDistance=3, camPitch=0, camYaw=90)
+
+def makeSnakeNpyDataset(sumSamples=10000):
+    snake = p.loadURDF('urdf/snake.urdf', [0, 0, 0.25])
+    makeSnakeDatasetNpy(snake, sumSamples, motionRange=2,
+                camDistance=3, camPitch=-89, camYaw=0)
+
+def makeSnakeDatasetNpy(robot, numSamples, motionRange, camDistance, camPitch, camYaw):
+    robotName = 'snake'
+    path = 'data/snake'
+    joints_buffer = []
+    image_buffer = []
+
+    numJoints = p.getNumJoints(robot)
+    i = 0
+    for i in range(numSamples):
+        print(f"sample {i}")
+        # Randomize initial orientation for the first segment for snake
+        initShift = np.random.rand(1)
+        initAngle = np.random.rand(1) * 6.28
+        initAngle *= random.choice((-1, 1))
+        p.resetBasePositionAndOrientation(robot,
+                                            [initShift, 0, 0.25],
+                                            p.getQuaternionFromEuler([initAngle, 1.57, 0]))
+
+        jointPositions = np.random.rand(numJoints) * motionRange
+        for joint in range(numJoints):
+            jointPositions[joint] *= random.choice((-1, 1))
+            p.resetJointState(robot, joint, jointPositions[joint])
+
+
+        robotPos, _ = p.getBasePositionAndOrientation(robot)
+        p.resetDebugVisualizerCamera(cameraDistance=camDistance,
+                                     cameraPitch=camPitch,
+                                     cameraYaw=camYaw,
+                                     cameraTargetPosition=robotPos)
+
+        img = np.reshape(p.getCameraImage(224, 224)[2], (224, 224, 4))[:,:,0:3] #BGR
+        # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        image_buffer.append(img)
+        joints_buffer.append(np.divide(jointPositions, 2.0))
+
+        time.sleep(0.1)
+        p.stepSimulation()
+    
+    joints_buffer = np.matrix(joints_buffer, dtype=np.float32)
+    image_buffer = np.array(image_buffer, dtype=np.float32)
+
+    # create folders
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    # files
+    joints_file = os.path.join(path, 'joints.npy')
+    images_file = os.path.join(path, 'images.npy')
+
+    # create files
+    with open(joints_file, 'wb+') as f:
+        np.save(f, joints_buffer)
+    with open(images_file, 'wb+') as f:
+        np.save(f, image_buffer)
+
+    p.disconnect()
 
 
 def makeDataset(robot, robotName, numSamples, motionRange,
@@ -81,5 +146,4 @@ def makeDataset(robot, robotName, numSamples, motionRange,
 
     p.disconnect()
 
-
-makeSnakeDataset(numSamples=30)
+makeSnakeNpyDataset(1000)
