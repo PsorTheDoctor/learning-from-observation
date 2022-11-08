@@ -3,13 +3,13 @@
 Available models in urdf folder:
 
 ### Snake
-![snake](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/snake.png)
+![snake](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/snake.png)
 
 ### Ant
-![ant](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/ant.png)
+![ant](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/ant.png)
 
 ### Turtle
-![turtle](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/turtle.png)
+![turtle](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/turtle.png)
 
 ### Manipulator
-![manipulator](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/manipulator.png)
+![manipulator](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/manipulator.png)
