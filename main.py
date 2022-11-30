@@ -62,6 +62,7 @@ def inputVideo(filename, sharedImg):
 
 
 def estimatePose(img, joints):
+    img = np.reshape(img , (1, 256, 256, 3))
     net = DeepViT(
         image_size=256,
         patch_size=32,
@@ -74,10 +75,10 @@ def estimatePose(img, joints):
         emb_dropout=0.1
     )
     preds = net(img)
-
+    print(preds)
     # preds = np.zeros(2, dtype=np.float32)
     for i in range(len(preds)):
-        joints[i] = preds[i]
+        joints[i] = preds[0][i]
 
 
 def outputSim(joints):

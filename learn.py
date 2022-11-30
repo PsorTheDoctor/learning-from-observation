@@ -1,6 +1,8 @@
 import tensorflow as tf
 from models.model import AlexNet, TestModel
 from models.vit import DeepViT
+# import keras
+from tensorflow.python import keras
 # from models.swin import SwinTransformerModel
 import pandas as pd
 import numpy as np
@@ -37,6 +39,7 @@ def vit():
         dropout = 0.1,
         emb_dropout = 0.1
     )
+    model.load("models/vit")
 
     # create optimizer
     optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
@@ -53,7 +56,7 @@ def vit():
     tf.summary.trace_on(graph=True, profiler=True)
 
     # custom training loop
-    for i in range(10000):
+    for i in range(1):
         # random BATCH_SIZE indexes for batch processing
         indexes = np.random.randint(0, len(images), BATCH_SIZE)
         # get batch images and joint positions
@@ -80,6 +83,9 @@ def vit():
             tf.summary.scalar('val_loss', loss, step=i)
             tf.summary.histogram('val_out', out, step=i)
             tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+    
+    # save model
+    model.save("models/vit")
 
 def swin():
     #read images and joint positions

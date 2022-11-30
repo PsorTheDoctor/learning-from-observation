@@ -4,7 +4,9 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Layer
 from tensorflow.keras import Sequential
 import tensorflow.keras.layers as nn
-
+import json
+import os
+import numpy as np
 from einops import rearrange, repeat
 from einops.layers.tensorflow import Rearrange
 
@@ -17,6 +19,12 @@ class PreNorm(Layer):
 
     def call(self, x, training=True):
         return self.fn(self.norm(x), training=training)
+    
+    def save_weights(self, filepath, overwrite=True, save_format=None, options=None):
+        self.fn.save_weights(filepath, overwrite, save_format, options)
+    
+    def load_weights(self, filepath, by_name=False, skip_mismatch=False, options=None):
+        self.fn.load_weights(filepath, by_name)
 
 class MLP(Layer):
     def __init__(self, dim, hidden_dim, dropout=0.0):
@@ -42,6 +50,12 @@ class MLP(Layer):
 
     def call(self, x, training=True):
         return self.net(x, training=training)
+    
+    def save_weights(self, filepath, overwrite=True, save_format=None, options=None):
+        self.net.save_weights(filepath, overwrite, save_format, options)
+    
+    def load_weights(self, filepath, by_name=False):
+        self.net.load_weights(filepath, by_name)
 
 class Attention(Layer):
     def __init__(self, dim, heads=8, dim_head=64, dropout=0.0):
@@ -69,6 +83,19 @@ class Attention(Layer):
 
         self.reattn_norm = Sequential(self.reattn_norm)
         self.to_out = Sequential(self.to_out)
+    
+    def save_weights(self, filepath, overwrite=True, save_format=None, options=None):
+        temp_value = self.reattn_weights.value()
+        with open(filepath + '_reattn_weights', 'w') as f:
+            json.dump(temp_value.numpy().tolist(), f)
+        self.to_out.save_weights(filepath + '_to_out_', overwrite, save_format, options)
+    
+    def load_weights(self, filepath, by_name=False):
+        loaded_value = None
+        with open(filepath + '_reattn_weights', 'r') as f:
+            loaded_value = json.load(f)
+        self.reattn_weights.assign(loaded_value)
+        self.to_out.load_weights(filepath + '_to_out_', by_name)
 
     def call(self, x, training=True):
         qkv = self.to_qkv(x)
@@ -108,6 +135,21 @@ class Transformer(Layer):
             x = mlp(x, training=training) + x
 
         return x
+    
+    def save_weights(self, filepath, overwrite=True, save_format=None, options=None):
+        # create dir if not exists
+        if not os.path.exists(filepath):
+            os.makedirs(filepath)
+        for i, layer in enumerate(self.layers):
+            attn, mlp = layer
+            attn.save_weights(filepath + '/attn_{}.h5'.format(i), overwrite=overwrite, save_format=save_format, options=options)
+            mlp.save_weights(filepath + '/mlp_{}.h5'.format(i), overwrite=overwrite, save_format=save_format, options=options)
+    
+    def load_weights(self, filepath, by_name=False, skip_mismatch=False, options=None):
+        for i, layer in enumerate(self.layers):
+            attn, mlp = layer
+            attn.load_weights(filepath + '/attn_{}.h5'.format(i))
+            mlp.load_weights(filepath + '/mlp_{}.h5'.format(i))
 
 class DeepViT(Model):
     def __init__(self, image_size, patch_size, num_classes, dim, depth, heads, mlp_dim,
@@ -136,6 +178,18 @@ class DeepViT(Model):
             nn.Dense(units=num_classes)
         ], name='mlp_head')
 
+        # save parameters to local variables
+        self.image_size = image_size
+        self.patch_size = patch_size
+        self.num_patches = num_patches
+        self.dim = dim
+        self.heads = heads
+        self.dim_head = dim_head
+        self.mlp_dim = mlp_dim
+        self.pool = pool
+        self.dropout_param = dropout
+        self.emb_dropout = emb_dropout 
+
     def call(self, img, training=True, **kwargs):
         x = self.patch_embedding(img)
         b, n, d = x.shape
@@ -155,6 +209,42 @@ class DeepViT(Model):
         x = self.mlp_head(x)
 
         return x
+    
+    def save(self, path):
+        self.patch_embedding.save_weights(path + '/patch_embedding')
+        self.mlp_head.save_weights(path + '/mlp_head')
+        self.transformer.save_weights(path + '/transformer')
+        np.save(path + '/cls_token.npy', self.cls_token.numpy())
+        np.save(path + '/pos_embedding.npy', self.pos_embedding.numpy())
+        # save parameters
+        with open(path + '/parameters.json', 'w') as f:
+            json.dump({
+                'image_size': self.image_size,
+                'patch_size': self.patch_size,
+                'num_patches': self.num_patches,
+                'dim': self.dim,
+                'heads': self.heads,
+                'dim_head': self.dim_head,
+                'mlp_dim': self.mlp_dim,
+                'pool': self.pool,
+                'dropout_param': self.dropout_param,
+                'emb_dropout': self.emb_dropout
+            }, f)
+        
+    
+    def load(self, path):
+        # first call for initializing variables
+        self(tf.zeros([1, self.image_size, self.image_size, 3]))
+        #load parameters
+        with open(path + '/parameters.json', 'r') as f:
+            parameters = json.load(f)
+        self.dropout = nn.Dropout(rate=parameters['emb_dropout'])
+        self.patch_embedding.load_weights(path + '/patch_embedding')
+        self.mlp_head.load_weights(path + '/mlp_head')
+        self.transformer.load_weights(path + '/transformer')
+        self.cls_token = tf.Variable(initial_value=np.load(path + '/cls_token.npy'))
+        self.pos_embedding = tf.Variable(initial_value=np.load(path + '/pos_embedding.npy'))
+
 
 """ Usage
 v = DeepViT(
