@@ -16,6 +16,21 @@ IMAGES_PATH = "data/snake/images.npy"
 VALIDATION_SIZE = 100
 BATCH_SIZE = 64
 
+def test_vit():
+     # create model vit
+    model = DeepViT(
+        image_size = 224,
+        patch_size = 28,
+        num_classes = 2,
+        dim = 1024, # 26x26
+        depth = 3,
+        heads = 10,
+        mlp_dim = 512,
+        dropout = 0.1,
+        emb_dropout = 0.1
+    )
+    model.fit("data/snake/joints.npy", IMAGES_PATH, 100, BATCH_SIZE)
+
 def vit():
 
     # read images and joint positions
@@ -56,9 +71,9 @@ def vit():
     tf.summary.trace_on(graph=True, profiler=True)
 
     # custom training loop
-    for i in range(1):
+    for i in range(10):
         # random BATCH_SIZE indexes for batch processing
-        indexes = np.random.randint(0, len(images), BATCH_SIZE)
+        indexes = np.random.randint(VALIDATION_SIZE, len(images), BATCH_SIZE)
         # get batch images and joint positions
         batch_images = images[indexes]
         batch_joint_pos = joint_pos[indexes]
@@ -151,4 +166,4 @@ def swin():
             tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
 
 if __name__ == "__main__":
-    vit()
+    test_vit()

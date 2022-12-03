@@ -65,7 +65,8 @@ def makeSnakeDatasetNpy(robot, numSamples, motionRange, camDistance, camPitch, c
             jointPositions[joint] *= random.choice((-1, 1))
             p.resetJointState(robot, joint, jointPositions[joint])
 
-
+        camYaw = random.randint(-180,180)
+        camPitch = random.randint(-90,-45)
         robotPos, _ = p.getBasePositionAndOrientation(robot)
         p.resetDebugVisualizerCamera(cameraDistance=camDistance,
                                      cameraPitch=camPitch,
@@ -74,6 +75,7 @@ def makeSnakeDatasetNpy(robot, numSamples, motionRange, camDistance, camPitch, c
 
         img = np.reshape(p.getCameraImage(224, 224)[2], (224, 224, 4))[:,:,0:3] #BGR
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # cv2.imwrite(filename=f"img{i}.jpg", img=img)
 
         image_buffer.append(img)
         joints_buffer.append(np.divide(jointPositions, 2.0))
@@ -146,4 +148,4 @@ def makeDataset(robot, robotName, numSamples, motionRange,
 
     p.disconnect()
 
-makeSnakeNpyDataset(1000)
+makeSnakeNpyDataset(5000)

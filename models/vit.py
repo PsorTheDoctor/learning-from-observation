@@ -4,6 +4,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Layer
 from tensorflow.keras import Sequential
 import tensorflow.keras.layers as nn
+import datetime
 import json
 import os
 import numpy as np
@@ -244,6 +245,54 @@ class DeepViT(Model):
         self.transformer.load_weights(path + '/transformer')
         self.cls_token = tf.Variable(initial_value=np.load(path + '/cls_token.npy'))
         self.pos_embedding = tf.Variable(initial_value=np.load(path + '/pos_embedding.npy'))
+    
+    def fit(self, joints_path, images_path, validation_size, batch_size, learning_rate = 0.001, loss_fn = tf.keras.losses.Huber(), log_dir = "logs/vit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), save_path = 'model/vit'):
+            # read images and joint positions
+        joint_pos = np.reshape(np.load(joints_path), (-1, 2))
+        images = np.load(images_path)
+
+        optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
+
+        # create loss function
+        loss_fn = tf.keras.losses.Huber()
+
+        # create tensorboard
+        writer = tf.summary.create_file_writer(log_dir)
+        writer.set_as_default()
+
+        #set default tensorboard
+        tf.summary.trace_on(graph=True, profiler=True)
+
+        # custom training loop
+        for i in range(10):
+            # random BATCH_SIZE indexes for batch processing
+            indexes = np.random.randint(validation_size, len(images), batch_size)
+            # get batch images and joint positions
+            batch_images = images[indexes]
+            batch_joint_pos = joint_pos[indexes]
+            with tf.GradientTape() as tape:
+                out = self(batch_images)
+                loss = loss_fn(batch_joint_pos, out)
+            grads = tape.gradient(loss, self.trainable_weights)
+            optimizer.apply_gradients(zip(grads, self.trainable_weights))
+            # tensorboard
+            tf.summary.scalar('loss', loss, step=i)
+            tf.summary.histogram('out', out, step=i)
+            tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
+            # validation step
+            if i % 10 == 0:
+                # random BATCH_SIZE indexes for batch processing
+                indexes = np.random.randint(0, validation_size, batch_size)
+                # get batch images and joint positions
+                batch_images = images[indexes]
+                batch_joint_pos = joint_pos[indexes]
+                out = self(batch_images)
+                loss = loss_fn(batch_joint_pos, out)
+                tf.summary.scalar('val_loss', loss, step=i)
+                tf.summary.histogram('val_out', out, step=i)
+                tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+        
+        self.save(save_path)
 
 
 """ Usage
