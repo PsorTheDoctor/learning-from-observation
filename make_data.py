@@ -1,8 +1,6 @@
-from copy import deepcopy
 import pybullet as p
 import pybullet_data
 import numpy as np
-import cv2
 import time
 import os
 import random
@@ -37,115 +35,72 @@ def makeManipulatorDataset(numSamples=10000):
     makeDataset(manipulator, 'manipulator', numSamples, motionRange=2,
                 camDistance=3, camPitch=0, camYaw=90)
 
-def makeSnakeNpyDataset(sumSamples=10000):
-    snake = p.loadURDF('urdf/snake.urdf', [0, 0, 0.25])
-    makeSnakeDatasetNpy(snake, sumSamples, motionRange=2,
-                camDistance=3, camPitch=-89, camYaw=0)
 
-def makeSnakeDatasetNpy(robot, numSamples, motionRange, camDistance, camPitch, camYaw):
-    robotName = 'snake'
-    path = 'data/snake'
-    joints_buffer = []
-    image_buffer = []
+def makeDataset(robot, robotName, numSamples, motionRange, camDistance, camPitch, camYaw):
+    """
+    General function to make a dataset that can be customized to the each robot.
+    """
+    path = 'data/' + robotName
+    jointsBuffer = []
+    imgBuffer = []
 
     numJoints = p.getNumJoints(robot)
-    i = 0
+
     for i in range(numSamples):
-        print(f"sample {i}")
-        # Randomize initial orientation for the first segment for snake
-        initShift = np.random.rand(1)
-        initAngle = np.random.rand(1) * 6.28
-        initAngle *= random.choice((-1, 1))
-        p.resetBasePositionAndOrientation(robot,
-                                            [initShift, 0, 0.25],
-                                            p.getQuaternionFromEuler([initAngle, 1.57, 0]))
+        # Print the progress by every 100 iterations
+        if i % 100 == 0:
+            print(f"Sample {i}/{numSamples}")
+
+        if robotName == 'snake':
+            # Randomize initial orientation for the first segment for snake
+            initShift = np.random.rand(1)
+            initAngle = np.random.rand(1) * 6.28
+            initAngle *= random.choice((-1, 1))
+            p.resetBasePositionAndOrientation(robot,
+                                                [initShift, 0, 0.25],
+                                                p.getQuaternionFromEuler([initAngle, 1.57, 0]))
 
         jointPositions = np.random.rand(numJoints) * motionRange
         for joint in range(numJoints):
             jointPositions[joint] *= random.choice((-1, 1))
             p.resetJointState(robot, joint, jointPositions[joint])
 
-        camYaw = random.randint(-180,180)
-        camPitch = random.randint(-90,-45)
+        camYaw = random.randint(-180, 180)
+        camPitch = random.randint(camPitch-30, camPitch+30)
         robotPos, _ = p.getBasePositionAndOrientation(robot)
         p.resetDebugVisualizerCamera(cameraDistance=camDistance,
                                      cameraPitch=camPitch,
                                      cameraYaw=camYaw,
                                      cameraTargetPosition=robotPos)
 
-        img = np.reshape(p.getCameraImage(224, 224)[2], (224, 224, 4))[:,:,0:3] #BGR
+        img = np.reshape(p.getCameraImage(224, 224)[2], (224, 224, 4))[:, :, 0:3]  # BGR
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # cv2.imwrite(filename=f"img{i}.jpg", img=img)
 
-        image_buffer.append(img)
-        joints_buffer.append(np.divide(jointPositions, 2.0))
+        imgBuffer.append(img)
+        jointsBuffer.append(np.divide(jointPositions, 2.0))
 
         time.sleep(0.1)
         p.stepSimulation()
     
-    joints_buffer = np.matrix(joints_buffer, dtype=np.float32)
-    image_buffer = np.array(image_buffer, dtype=np.float32)
+    jointsBuffer = np.matrix(jointsBuffer, dtype=np.float32)
+    imgBuffer = np.array(imgBuffer, dtype=np.float32)
 
     # create folders
     if not os.path.exists(path):
         os.makedirs(path)
     
     # files
-    joints_file = os.path.join(path, 'joints.npy')
-    images_file = os.path.join(path, 'images.npy')
+    jointsFile = os.path.join(path, 'joints.npy')
+    imgFile = os.path.join(path, 'images.npy')
 
     # create files
-    with open(joints_file, 'wb+') as f:
-        np.save(f, joints_buffer)
-    with open(images_file, 'wb+') as f:
-        np.save(f, image_buffer)
+    with open(jointsFile, 'wb+') as f:
+        np.save(f, jointsBuffer)
+    with open(imgFile, 'wb+') as f:
+        np.save(f, imgBuffer)
 
     p.disconnect()
 
 
-def makeDataset(robot, robotName, numSamples, motionRange,
-                camDistance, camPitch, camYaw):
-    filename = '{}.txt'.format(robotName)
-    with open(filename, 'w') as f:
-        f.truncate(0)
-
-    numJoints = p.getNumJoints(robot)
-    i = 0
-    while i < numSamples:
-        # Randomize initial orientation for the first segment for snake
-        if robotName == 'snake':
-            initShift = np.random.rand(1)
-            initAngle = np.random.rand(1) * 6.28
-            initAngle *= random.choice((-1, 1))
-            p.resetBasePositionAndOrientation(robot,
-                                              [initShift, 0, 0.25],
-                                              p.getQuaternionFromEuler([initAngle, 1.57, 0]))
-
-        jointPositions = np.random.rand(numJoints) * motionRange
-        for joint in range(numJoints):
-            jointPositions[joint] *= random.choice((-1, 1))
-            p.resetJointState(robot, joint, jointPositions[joint])
-
-        decimals = 4
-        with open(filename, 'a') as f:
-            line = 'id: {} joints: '.format(i)
-            for joint in jointPositions:
-                line += str(round(joint, decimals)) + ' '
-            f.write(line + '\n')
-
-        robotPos, _ = p.getBasePositionAndOrientation(robot)
-        p.resetDebugVisualizerCamera(cameraDistance=camDistance,
-                                     cameraPitch=camPitch,
-                                     cameraYaw=camYaw,
-                                     cameraTargetPosition=robotPos)
-
-        img = p.getCameraImage(224, 224)[2]
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite('{}/{}.jpg'.format(robotName, i), gray)
-        i += 1
-        time.sleep(0.1)
-        p.stepSimulation()
-
-    p.disconnect()
-
-makeSnakeNpyDataset(5000)
+makeSnakeDataset(5000)

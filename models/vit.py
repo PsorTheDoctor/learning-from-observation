@@ -11,6 +11,7 @@ import numpy as np
 from einops import rearrange, repeat
 from einops.layers.tensorflow import Rearrange
 
+
 class PreNorm(Layer):
     def __init__(self, fn):
         super(PreNorm, self).__init__()
@@ -26,6 +27,7 @@ class PreNorm(Layer):
     
     def load_weights(self, filepath, by_name=False, skip_mismatch=False, options=None):
         self.fn.load_weights(filepath, by_name)
+
 
 class MLP(Layer):
     def __init__(self, dim, hidden_dim, dropout=0.0):
@@ -58,6 +60,7 @@ class MLP(Layer):
     def load_weights(self, filepath, by_name=False):
         self.net.load_weights(filepath, by_name)
 
+
 class Attention(Layer):
     def __init__(self, dim, heads=8, dim_head=64, dropout=0.0):
         super(Attention, self).__init__()
@@ -89,12 +92,14 @@ class Attention(Layer):
         temp_value = self.reattn_weights.value()
         with open(filepath + '_reattn_weights', 'w') as f:
             json.dump(temp_value.numpy().tolist(), f)
+
         self.to_out.save_weights(filepath + '_to_out_', overwrite, save_format, options)
     
     def load_weights(self, filepath, by_name=False):
         loaded_value = None
         with open(filepath + '_reattn_weights', 'r') as f:
             loaded_value = json.load(f)
+
         self.reattn_weights.assign(loaded_value)
         self.to_out.load_weights(filepath + '_to_out_', by_name)
 
@@ -115,13 +120,12 @@ class Attention(Layer):
         x = tf.matmul(attn, v)
         x = rearrange(x, 'b h n d -> b n (h d)')
         x = self.to_out(x, training=training)
-
         return x
+
 
 class Transformer(Layer):
     def __init__(self, dim, depth, heads, dim_head, mlp_dim, dropout=0.0):
         super(Transformer, self).__init__()
-
         self.layers = []
 
         for _ in range(depth):
@@ -141,6 +145,7 @@ class Transformer(Layer):
         # create dir if not exists
         if not os.path.exists(filepath):
             os.makedirs(filepath)
+
         for i, layer in enumerate(self.layers):
             attn, mlp = layer
             attn.save_weights(filepath + '/attn_{}.h5'.format(i), overwrite=overwrite, save_format=save_format, options=options)
@@ -151,6 +156,7 @@ class Transformer(Layer):
             attn, mlp = layer
             attn.load_weights(filepath + '/attn_{}.h5'.format(i))
             mlp.load_weights(filepath + '/mlp_{}.h5'.format(i))
+
 
 class DeepViT(Model):
     def __init__(self, image_size, patch_size, num_classes, dim, depth, heads, mlp_dim,
@@ -169,9 +175,7 @@ class DeepViT(Model):
         self.pos_embedding = tf.Variable(initial_value=tf.random.normal([1, num_patches + 1, dim]))
         self.cls_token = tf.Variable(initial_value=tf.random.normal([1, 1, dim]))
         self.dropout = nn.Dropout(rate=emb_dropout)
-
         self.transformer = Transformer(dim, depth, heads, dim_head, mlp_dim, dropout)
-
         self.pool = pool
 
         self.mlp_head = Sequential([
@@ -208,7 +212,6 @@ class DeepViT(Model):
             x = x[:, 0]
 
         x = self.mlp_head(x)
-
         return x
     
     def save(self, path):
@@ -231,7 +234,6 @@ class DeepViT(Model):
                 'dropout_param': self.dropout_param,
                 'emb_dropout': self.emb_dropout
             }, f)
-        
     
     def load(self, path):
         # first call for initializing variables
@@ -239,6 +241,7 @@ class DeepViT(Model):
         #load parameters
         with open(path + '/parameters.json', 'r') as f:
             parameters = json.load(f)
+
         self.dropout = nn.Dropout(rate=parameters['emb_dropout'])
         self.patch_embedding.load_weights(path + '/patch_embedding')
         self.mlp_head.load_weights(path + '/mlp_head')
@@ -246,15 +249,15 @@ class DeepViT(Model):
         self.cls_token = tf.Variable(initial_value=np.load(path + '/cls_token.npy'))
         self.pos_embedding = tf.Variable(initial_value=np.load(path + '/pos_embedding.npy'))
     
-    def fit(self, joints_path, images_path, validation_size, batch_size, learning_rate = 0.001, loss_fn = tf.keras.losses.Huber(), log_dir = "logs/vit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), save_path = 'model/vit'):
-            # read images and joint positions
+    def fit(self, epochs, joints_path, images_path, validation_size=100, batch_size=64, learning_rate=5e-5,
+            loss_fn=tf.keras.losses.Huber(), log_dir="logs/vit/"+datetime.datetime.now().strftime("%Y%m%d-%H%M%S"),
+            save_path='model/vit'):
+
+        # read images and joint positions
         joint_pos = np.reshape(np.load(joints_path), (-1, 2))
         images = np.load(images_path)
 
-        optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
-
-        # create loss function
-        loss_fn = tf.keras.losses.Huber()
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         # create tensorboard
         writer = tf.summary.create_file_writer(log_dir)
@@ -264,25 +267,30 @@ class DeepViT(Model):
         tf.summary.trace_on(graph=True, profiler=True)
 
         # custom training loop
-        for i in range(10):
+        for i in range(epochs):
             # random BATCH_SIZE indexes for batch processing
             indexes = np.random.randint(validation_size, len(images), batch_size)
+
             # get batch images and joint positions
             batch_images = images[indexes]
             batch_joint_pos = joint_pos[indexes]
             with tf.GradientTape() as tape:
                 out = self(batch_images)
                 loss = loss_fn(batch_joint_pos, out)
+
             grads = tape.gradient(loss, self.trainable_weights)
             optimizer.apply_gradients(zip(grads, self.trainable_weights))
+
             # tensorboard
             tf.summary.scalar('loss', loss, step=i)
             tf.summary.histogram('out', out, step=i)
             tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
+
             # validation step
             if i % 10 == 0:
                 # random BATCH_SIZE indexes for batch processing
                 indexes = np.random.randint(0, validation_size, batch_size)
+
                 # get batch images and joint positions
                 batch_images = images[indexes]
                 batch_joint_pos = joint_pos[indexes]

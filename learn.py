@@ -74,18 +74,22 @@ def vit():
     for i in range(10):
         # random BATCH_SIZE indexes for batch processing
         indexes = np.random.randint(VALIDATION_SIZE, len(images), BATCH_SIZE)
+
         # get batch images and joint positions
         batch_images = images[indexes]
         batch_joint_pos = joint_pos[indexes]
         with tf.GradientTape() as tape:
             out = model(batch_images)
             loss = loss_fn(batch_joint_pos, out)
+
         grads = tape.gradient(loss, model.trainable_weights)
         optimizer.apply_gradients(zip(grads, model.trainable_weights))
+
         # tensorboard
         tf.summary.scalar('loss', loss, step=i)
         tf.summary.histogram('out', out, step=i)
         tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
+
         # validation step
         if i % 10 == 0:
             # random BATCH_SIZE indexes for batch processing
@@ -101,6 +105,7 @@ def vit():
     
     # save model
     model.save("models/vit")
+
 
 def swin():
     #read images and joint positions
@@ -152,11 +157,11 @@ def swin():
         tf.summary.scalar('loss', loss, step=i)
         tf.summary.histogram('out', out, step=i)
         tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
-        #validation step
+        # validation step
         if i % 10 == 0:
-            #random BATCH_SIZE indexes for batch processing
+            # random BATCH_SIZE indexes for batch processing
             indexes = np.random.randint(0, VALIDATION_SIZE, BATCH_SIZE)
-            #get batch images and joint positions
+            # get batch images and joint positions
             batch_images = validation_data[0][indexes]
             batch_joint_pos = validation_data[1][indexes]
             out = model(batch_images)
