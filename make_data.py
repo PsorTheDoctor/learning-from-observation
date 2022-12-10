@@ -14,29 +14,31 @@ plane = p.loadURDF('plane.urdf')
 def makeTurtleDataset(numSamples=10000):
     turtle = p.loadURDF('urdf/turtle.urdf', [0, 0, 0.25])
     makeDataset(turtle, 'turtle', numSamples, motionRange=0.3,
-                camDistance=4, camPitch=-45, camYaw=0)
+                initCamDistance=4, initCamPitch=-45, initCamYaw=0)
 
 
 def makeAntDataset(numSamples=10000):
     ant = p.loadURDF('urdf/ant.urdf', [0, 0, 2])
     makeDataset(ant, 'ant', numSamples, motionRange=1,
-                camDistance=4, camPitch=-60, camYaw=45)
+                initCamDistance=4, initCamPitch=-60, initCamYaw=45)
 
 
 def makeSnakeDataset(numSamples=10000):
     snake = p.loadURDF('urdf/snake.urdf', [0, 0, 0.25])
     makeDataset(snake, 'snake', numSamples, motionRange=2,
-                camDistance=3, camPitch=-89, camYaw=0)
+                initCamDistance=3, initCamPitch=-89, initCamYaw=0)
 
 
 def makeManipulatorDataset(numSamples=10000):
     orn = p.getQuaternionFromEuler([0, -1.57, 0])
+    # Snake .urdf model attached to the ground acts like a manipulator
     manipulator = p.loadURDF('urdf/snake.urdf', [0, 0, 2.25], orn)
     makeDataset(manipulator, 'manipulator', numSamples, motionRange=2,
-                camDistance=3, camPitch=0, camYaw=90)
+                initCamDistance=3, initCamPitch=0, initCamYaw=90)
 
 
-def makeDataset(robot, robotName, numSamples, motionRange, camDistance, camPitch, camYaw):
+def makeDataset(robot, robotName, numSamples, motionRange,
+                initCamDistance, initCamPitch, initCamYaw):
     """
     General function to make a dataset that can be customized to the each robot.
     """
@@ -66,9 +68,9 @@ def makeDataset(robot, robotName, numSamples, motionRange, camDistance, camPitch
             p.resetJointState(robot, joint, jointPositions[joint])
 
         camYaw = random.randint(-180, 180)
-        camPitch = random.randint(camPitch-30, camPitch+30)
+        camPitch = random.randint(initCamPitch-30, initCamPitch+30)
         robotPos, _ = p.getBasePositionAndOrientation(robot)
-        p.resetDebugVisualizerCamera(cameraDistance=camDistance,
+        p.resetDebugVisualizerCamera(cameraDistance=initCamDistance,
                                      cameraPitch=camPitch,
                                      cameraYaw=camYaw,
                                      cameraTargetPosition=robotPos)
@@ -103,4 +105,4 @@ def makeDataset(robot, robotName, numSamples, motionRange, camDistance, camPitch
     p.disconnect()
 
 
-makeSnakeDataset(5000)
+# makeSnakeDataset(1000)
