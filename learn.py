@@ -16,6 +16,7 @@ IMAGES_PATH = "data/snake/images.npy"
 VALIDATION_SIZE = 100
 BATCH_SIZE = 64
 
+
 def test_vit():
      # create model vit
     model = DeepViT(
@@ -31,8 +32,8 @@ def test_vit():
     )
     model.fit("data/snake/joints.npy", IMAGES_PATH, 100, BATCH_SIZE)
 
-def vit():
 
+def vit():
     # read images and joint positions
     joint_pos = np.reshape(np.load(JOINT_PATH), (-1, 2))
     images = np.load(IMAGES_PATH)
@@ -72,7 +73,7 @@ def vit():
 
     # custom training loop
     for i in range(10):
-        # random BATCH_SIZE indexes for batch processing
+        # random BATCH_SIZE indices for batch processing
         indexes = np.random.randint(VALIDATION_SIZE, len(images), BATCH_SIZE)
 
         # get batch images and joint positions
@@ -92,6 +93,8 @@ def vit():
 
         # validation step
         if i % 10 == 0:
+            print(f'Iter {i}/{epochs}')
+
             # random BATCH_SIZE indexes for batch processing
             indexes = np.random.randint(0, VALIDATION_SIZE, BATCH_SIZE)
             # get batch images and joint positions

@@ -121,4 +121,4 @@ def makeDataset(robot, robotName, numSamples, motionRange,
     p.disconnect()
 
 
-makeSnakeDataset(1000)
+makeTurtleDataset(1000)

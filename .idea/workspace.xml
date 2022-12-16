@@ -3,7 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="2c64ca73-105d-4f8d-b6ff-fe7c7a80989d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/learn.py" beforeDir="false" afterPath="$PROJECT_DIR$/learn.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/make_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/make_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/vit.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/vit.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -58,26 +60,26 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1182" />
-          <entry key="txt" value="54" />
+          <entry key="py" value="1264" />
+          <entry key="txt" value="78" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="54" />
-          <entry key="Python" value="1182" />
+          <entry key="PLAIN_TEXT" value="78" />
+          <entry key="Python" value="1264" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="npy" value="1" />
-          <entry key="py" value="1" />
+          <entry key="npy" value="3" />
+          <entry key="py" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="PLAIN_TEXT" value="1" />
-          <entry key="Python" value="1" />
+          <entry key="PLAIN_TEXT" value="3" />
+          <entry key="Python" value="2" />
         </counts>
       </usages-collector>
     </session>
@@ -87,7 +89,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1320">
+            <state relative-caret-position="497">
               <caret line="64" column="10" selection-start-line="64" selection-start-column="10" selection-end-line="64" selection-end-column="10" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
@@ -96,16 +98,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/images/manipulator.png">
-          <provider selected="true" editor-type-id="images" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/learn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2352">
-              <caret line="108" selection-start-line="108" selection-end-line="108" />
+            <state relative-caret-position="65">
+              <caret line="124" column="9" selection-start-line="124" selection-start-column="8" selection-end-line="124" selection-end-column="9" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -114,9 +111,16 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/model.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-69" />
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/generate_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="-1080">
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -124,16 +128,21 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/make_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="123" column="20" selection-start-line="123" selection-start-column="20" selection-end-line="123" selection-end-column="20" />
+            <state relative-caret-position="1107">
+              <caret line="124" selection-start-line="124" selection-end-line="124" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/turtle/train/images.npy">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -153,8 +162,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/vit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5832">
-              <caret line="254" selection-start-line="254" selection-end-line="254" />
+            <state relative-caret-position="144">
+              <caret line="291" lean-forward="true" selection-start-line="291" selection-end-line="291" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -194,9 +203,9 @@
         <option value="$PROJECT_DIR$/img2sim.py" />
         <option value="$PROJECT_DIR$/sim2sim.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/learn.py" />
-        <option value="$PROJECT_DIR$/models/vit.py" />
         <option value="$PROJECT_DIR$/make_data.py" />
+        <option value="$PROJECT_DIR$/models/vit.py" />
+        <option value="$PROJECT_DIR$/learn.py" />
       </list>
     </option>
   </component>
@@ -221,12 +230,6 @@
               <item name="learning-from-videos" type="b2602c69:ProjectViewProjectNode" />
               <item name="learning-from-videos" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="learning-from-videos" type="b2602c69:ProjectViewProjectNode" />
-              <item name="learning-from-videos" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="snake" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="learning-from-videos" type="b2602c69:ProjectViewProjectNode" />
@@ -374,19 +377,26 @@
       <option name="project" value="LOCAL" />
       <updated>1670631168251</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Train &amp; test datasets">
+      <created>1671216630264</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671216630265</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1351" height="726" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12871288" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12871288" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32715008" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32715008" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.12984823" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -407,15 +417,13 @@
     <MESSAGE value="final sim skeleton" />
     <MESSAGE value="Tidying and removing doubled code" />
     <MESSAGE value="camera yaw corrected" />
-    <option name="LAST_COMMIT_MESSAGE" value="camera yaw corrected" />
+    <MESSAGE value="Train &amp; test datasets" />
+    <option name="LAST_COMMIT_MESSAGE" value="Train &amp; test datasets" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/img2sim.py" />
     <entry file="file://$PROJECT_DIR$/images/snake.png">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/model.py">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/data/snake/images.npy">
       <provider selected="true" editor-type-id="LargeFileEditor">
@@ -425,55 +433,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/snake_data.py" />
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1320">
-          <caret line="64" column="10" selection-start-line="64" selection-start-column="10" selection-end-line="64" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/images/manipulator.png">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/learn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2352">
-          <caret line="108" selection-start-line="108" selection-end-line="108" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/generate_data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/const.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/vit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5832">
-          <caret line="254" selection-start-line="254" selection-end-line="254" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -487,12 +453,69 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/make_data.py">
+    <entry file="file://$PROJECT_DIR$/data/turtle/test/images.npy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="123" column="20" selection-start-line="123" selection-start-column="20" selection-end-line="123" selection-end-column="20" />
+        <state relative-caret-position="72">
+          <caret line="1" column="146" lean-forward="true" selection-start-line="1" selection-start-column="146" selection-end-line="1" selection-end-column="146" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/turtle/train/images.npy">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/const.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1080">
           <folding>
             <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="497">
+          <caret line="64" column="10" selection-start-line="64" selection-start-column="10" selection-end-line="64" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-69" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/make_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1107">
+          <caret line="124" selection-start-line="124" selection-end-line="124" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/vit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="291" lean-forward="true" selection-start-line="291" selection-end-line="291" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/learn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="65">
+          <caret line="124" column="9" selection-start-line="124" selection-start-column="8" selection-end-line="124" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
