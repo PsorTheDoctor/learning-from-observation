@@ -266,6 +266,7 @@ class DeepViT(Model):
         #set default tensorboard
         tf.summary.trace_on(graph=True, profiler=True)
 
+        losses = []
         # custom training loop
         for i in range(epochs):
             # random BATCH_SIZE indexes for batch processing
@@ -286,9 +287,11 @@ class DeepViT(Model):
             tf.summary.histogram('out', out, step=i)
             tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
 
+            losses.append(loss)
+
             # validation step
             if i % 10 == 0:
-                print(f'Iter {i}/{epochs}')
+                print(f'Iter: {i}/{epochs} loss: {loss}')
 
                 # random BATCH_SIZE indexes for batch processing
                 indexes = np.random.randint(0, validation_size, batch_size)
@@ -303,6 +306,7 @@ class DeepViT(Model):
                 tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
         
         self.save(save_path)
+        return losses
 
 
 """ Usage
