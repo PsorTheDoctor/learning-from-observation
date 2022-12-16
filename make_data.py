@@ -40,11 +40,13 @@ def makeManipulatorDataset(numSamples=10000):
 def makeDataset(robot, robotName, numSamples, motionRange,
                 initCamDistance, initCamPitch, initCamYaw):
     """
-    General function to make a dataset that can be customized to the each robot.
+    General function to make a dataset that can be customized for the each robot.
     """
     path = 'data/' + robotName
+    trainPath = path + '/train/'
+    testPath = path + '/test/'
     jointsBuffer = []
-    imgBuffer = []
+    imagesBuffer = []
 
     numJoints = p.getNumJoints(robot)
 
@@ -79,30 +81,44 @@ def makeDataset(robot, robotName, numSamples, motionRange,
         # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # cv2.imwrite(filename=f"img{i}.jpg", img=img)
 
-        imgBuffer.append(img)
+        imagesBuffer.append(img)
         jointsBuffer.append(np.divide(jointPositions, 2.0))
 
         time.sleep(0.1)
         p.stepSimulation()
     
     jointsBuffer = np.matrix(jointsBuffer, dtype=np.float32)
-    imgBuffer = np.array(imgBuffer, dtype=np.float32)
+    imagesBuffer = np.array(imagesBuffer, dtype=np.float32)
+
+    # Create train and test datasets
+    jointsTrain = jointsBuffer[:int(0.8 * numSamples)]
+    jointsTest = jointsBuffer[-int(0.2 * numSamples):]
+    imagesTrain = imagesBuffer[:int(0.8 * numSamples)]
+    imagesTest = imagesBuffer[-int(0.2 * numSamples):]
 
     # create folders
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if not os.path.exists(trainPath):
+        os.makedirs(trainPath)
+    if not os.path.exists(testPath):
+        os.makedirs(testPath)
     
     # files
-    jointsFile = os.path.join(path, 'joints.npy')
-    imgFile = os.path.join(path, 'images.npy')
+    jointsTrainFile = os.path.join(path + '/train/', 'joints.npy')
+    jointsTestFile = os.path.join(path + '/test/', 'joints.npy')
+    imagesTrainFile = os.path.join(path + '/train/', 'images.npy')
+    imagesTestFile = os.path.join(path + '/test/', 'images.npy')
 
     # create files
-    with open(jointsFile, 'wb+') as f:
-        np.save(f, jointsBuffer)
-    with open(imgFile, 'wb+') as f:
-        np.save(f, imgBuffer)
+    with open(jointsTrainFile, 'wb+') as f:
+        np.save(f, jointsTrain)
+    with open(jointsTestFile, 'wb+') as f:
+        np.save(f, jointsTest)
+    with open(imagesTrainFile, 'wb+') as f:
+        np.save(f, imagesTrain)
+    with open(imagesTestFile, 'wb+') as f:
+        np.save(f, imagesTest)
 
     p.disconnect()
 
 
-# makeSnakeDataset(1000)
+makeSnakeDataset(1000)
