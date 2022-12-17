@@ -1,4 +1,4 @@
-# Learning robots by self-observation
+# Training robots by self-observation
 
 Available models in urdf folder:
 
