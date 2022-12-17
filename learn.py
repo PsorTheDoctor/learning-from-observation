@@ -71,9 +71,10 @@ def vit():
     #set default tensorboard
     tf.summary.trace_on(graph=True, profiler=True)
 
+    epochs = 10
     losses = []
     # custom training loop
-    for i in range(10):
+    for i in range(epochs):
         # random BATCH_SIZE indices for batch processing
         indexes = np.random.randint(VALIDATION_SIZE, len(images), BATCH_SIZE)
 
@@ -96,7 +97,7 @@ def vit():
 
         # validation step
         if i % 10 == 0:
-            print(f'Iter: {i}/{epochs} loss: {loss}')
+            print('Iter: {}/{} loss: {}'.format(i, epochs, round(loss, 4)))
 
             # random BATCH_SIZE indexes for batch processing
             indexes = np.random.randint(0, VALIDATION_SIZE, BATCH_SIZE)

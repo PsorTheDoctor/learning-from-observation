@@ -291,7 +291,7 @@ class DeepViT(Model):
 
             # validation step
             if i % 10 == 0:
-                print(f'Iter: {i}/{epochs} loss: {loss}')
+                print('Iter: {}/{} loss: {}'.format(i, epochs, round(loss, 4)))
 
                 # random BATCH_SIZE indexes for batch processing
                 indexes = np.random.randint(0, validation_size, batch_size)

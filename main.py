@@ -10,6 +10,22 @@ import time
 from models.vit import DeepViT
 
 
+p.connect(p.GUI)
+p.setAdditionalSearchPath(pybullet_data.getDataPath())
+p.setGravity(0, 0, -9.81)
+p.loadURDF('plane.urdf')
+snake = p.loadURDF('urdf/snake.urdf')
+
+
+def setSnake(jointPositions):
+    for i in range(2):
+        p.resetJointState(snake, i, jointPositions[i])
+
+    while True:
+        p.stepSimulation()
+        time.sleep(1./240.)
+
+
 def inputSim(sharedImg):
     p.connect(p.GUI)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -143,4 +159,6 @@ def video2sim(filename):
 
 
 if __name__ == '__main__':
-    img2sim('images/snake.png')
+    # img2sim('images/snake.png')
+    setSnake([0.509664, 0.327866])
+    # setSnake([0.232759, -0.300109])
