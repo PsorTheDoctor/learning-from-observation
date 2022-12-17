@@ -267,6 +267,7 @@ class DeepViT(Model):
         tf.summary.trace_on(graph=True, profiler=True)
 
         losses = []
+        val_losses = []
         # custom training loop
         for i in range(epochs):
             # random BATCH_SIZE indexes for batch processing
@@ -287,8 +288,6 @@ class DeepViT(Model):
             tf.summary.histogram('out', out, step=i)
             tf.summary.histogram('joint_pos', batch_joint_pos, step=i)
 
-            losses.append(loss)
-
             # validation step
             if i % 10 == 0:
                 print('Iter: {}/{} loss: {}'.format(i, epochs, round(loss, 4)))
@@ -300,13 +299,19 @@ class DeepViT(Model):
                 batch_images = images[indexes]
                 batch_joint_pos = joint_pos[indexes]
                 out = self(batch_images)
-                loss = loss_fn(batch_joint_pos, out)
-                tf.summary.scalar('val_loss', loss, step=i)
+                val_loss = loss_fn(batch_joint_pos, out)
+                tf.summary.scalar('val_loss', val_loss, step=i)
                 tf.summary.histogram('val_out', out, step=i)
                 tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+
+                losses.append(loss)
+                val_losses.append(val_loss)
         
         self.save(save_path)
-        return losses
+        return {
+            'loss': losses,
+            'val_loss': val_losses
+        }
 
 
 """ Usage
