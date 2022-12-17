@@ -305,7 +305,7 @@ class DeepViT(Model):
                 losses.append(loss)
                 val_losses.append(val_loss)
                 print('Iter: {}/{} loss: {} val_loss: {}'
-                      .format(i, epochs, round(loss, 4), round(val_loss(4))))
+                      .format(i, epochs, round(loss, 4), round(val_loss, round(4))))
         
         self.save(save_path)
         return {
