@@ -126,4 +126,4 @@ def makeDataset(robot, robotName, numSamples, motionRange,
     p.disconnect()
 
 
-makeManipulatorDataset(1000)
+makeManipulatorDataset(5000)

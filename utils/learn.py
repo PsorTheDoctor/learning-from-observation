@@ -7,7 +7,7 @@ from tensorflow.python import keras
 import pandas as pd
 import numpy as np
 import datetime
-from const import *
+from utils.const import *
 import os
 
 # https://www.inference.org.uk/itprnn/book.pdf
@@ -113,7 +113,7 @@ def vit():
     # save model
     model.save("models/vit")
 
-
+"""
 def swin():
     #read images and joint positions
     joint_pos = np.reshape(np.load(JOINT_PATH), (-1, 2))
@@ -176,6 +176,7 @@ def swin():
             tf.summary.scalar('val_loss', loss, step=i)
             tf.summary.histogram('val_out', out, step=i)
             tf.summary.histogram('val_joint_pos', batch_joint_pos, step=i)
+"""
 
 if __name__ == "__main__":
     test_vit()

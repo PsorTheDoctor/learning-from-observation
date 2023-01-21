@@ -7,7 +7,7 @@ import random
 import csv
 import os
 import shutil
-from const import *
+from utils.const import *
 
 p.connect(p.GUI)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
