@@ -1,15 +1,5 @@
 # Training robots by self-observation
 
-Available models in urdf folder:
+![models](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/models.png)
 
-### Snake
-![snake](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/snake.png)
-
-### Ant
-![ant](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/ant.png)
-
-### Turtle
-![turtle](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/turtle.png)
-
-### Manipulator
-![manipulator](https://github.com/PsorTheDoctor/pybullet_cv/blob/master/images/manipulator.png)
+A method to train embodied agents, such as articulated structures to follow visual instructions that are images presenting themselves in the various poses.
